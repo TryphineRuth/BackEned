@@ -1,21 +1,14 @@
-// require packages
 const express = require("express");
 const mongoose = require("mongoose");
-// const userRoutes = require("./routes/userRoutes");
-// const authRoutes = require("./routes/authRoutes");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const User = require("./models/user.model");
-const bodyParser = require("body-parser");
-const { signup, signin } = require("./controllers/auth_controller");
 
-const port = 3000
+const port = 3000;
 
-// initialise express
 const app = express();
 app.use(express.json());
-// app.use("user", userRoutes);
-// app.use("auth", authRoutes);
 
-//  mondodb connect
 mongoose
   .connect("mongodb+srv://admin:Truth@cluster0.69xowuj.mongodb.net/", {
     useNewUrlParser: true,
@@ -24,81 +17,72 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
 
-// create a schema
-// const studentSchema = new mongoose.Schema({
-//   roll_no: Number,
-//   name: String,
-//   year: Number,
-//   subjects: [String]
-// });
+app.post("/api/auth/signup", async (req, res) => {
+  try {
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      return res.status(409).json({ message: "User already exists" });
+    }
 
-// Create a new document
-// const user = new User({
-//   userID: 1001,
-//   username: "Madison Hyde",
-//   email: "madison@gmail.com",
-//   password: "madison123#",
-// });
-// const user2 = new User({
-//   userID: 1001,
-//   username: "Suzan Joan",
-//   email: "tryphyn@gmail.com",
-//   password: "suzajophine123#",
-// });
-// Add the document to Collections
-// user.save().then(
-//   () => console.log("One entry added"),
-//   (err) => console.log(err)
-// );
-// user2.save().then(
-//   () => console.log("Two entry added"),
-//   (err) => console.log(err)
-// );
-// Save method can also be written as:
-// stud.save((err, result) => {
-//     if(err) console.log(err);
-//     else console.log("entry added");
-// });
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-// get documents
-app.post("/users", (req, res) => {
-  console.log("ourData: ", req.body);
-
-  User.find()
-    .then((ourData) => {
-      return res.status(200).json({
-        ourData,
-      });
-    })
-    .catch((err) => {
-      res.status(500).json({
-        success: false,
-        message: "Server error. Please try again.",
-        error: err.message,
-      });
+    const newUser = new User({
+      username: req.body.username,
+      email: req.body.email,
+      password: hashedPassword,
     });
 
-  // return routes
+    await newUser.save();
 
-  // Student.find((err, found) => {
-  //     if (!err) {
-  //         res.send(found);
-  //     } else {
-  //         console.log(err);
-  //         res.send("Some error occured!")
-  //     }
-  // }).catch(err => console.log("Error occured, " + err));
+    res.status(201).json({ message: "User created successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error. Please try again." });
+  }
 });
 
-app.post("/api/auth/signup", (req, res) => {
-  signup(req, res);
+app.post("/api/auth/signin", async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    console.log(user)
+    if (!user) {
+      return res.status(401).json({ message: "Authentication failed" });
+    }
+
+    const passwordMatch = await bcrypt.compare(req.body.password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Authentication failed" });
+    }
+
+    const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      "your-secret-key",
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({ token });
+  } catch (error) {
+    res.status(500).json({ message: "Server error. Please try again." });
+  }
 });
 
-app.post("/api/auth/signin", (req, res) => {
-  signin(req, res);
+app.get("/api/protected", (req, res) => {
+  if (!req.headers.authorization) {
+    return res.status(401).json({ message: "Authorization header is missing" });
+  }
+
+  const authorizationHeader = req.headers.authorization;
+  const token = authorizationHeader.split(" ")[1];
+
+  try {
+    const decodedToken = jwt.verify(token, "your-secret-key");
+    const userId = decodedToken.userId;
+
+    res.status(200).json({ message: "Protected route accessed" });
+  } catch (error) {
+    res.status(401).json({ message: "Invalid token" });
+  }
 });
 
-// Server listen
 app.listen(port, () => {
   console.log(`Server listening to port ${port}`);
 });
