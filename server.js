@@ -89,6 +89,16 @@ app.delete("/api/user/delete-user", async (req, res) => {
     // Find the user by username and delete it
     const deletedUser = await User.findOneAndDelete({ username });
 
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+
 
 
 app.listen(port, () => {
