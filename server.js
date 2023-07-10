@@ -82,6 +82,14 @@ app.get("/api/protected", (req, res) => {
     res.status(401).json({ message: "Invalid token" });
   }
 });
+app.delete("/api/user/delete-user", async (req, res) => {
+  try {
+    const { username } = req.body;
+    console.log("username: ", username);
+    // Find the user by username and delete it
+    const deletedUser = await User.findOneAndDelete({ username });
+
+
 
 app.listen(port, () => {
   console.log(`Server listening to port ${port}`);
