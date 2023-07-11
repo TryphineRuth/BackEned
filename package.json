@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": " node backened.js "
+    "start": " node app.js "
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "example-module": "^1.0.0"
+    "all": "^0.0.0"
   }
 }
