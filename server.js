@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 
 mongoose
-  .connect("mongodb+srv://admin:Truth@cluster0.69xowuj.mongodb.net/", {
+  .connect("mongodb+srv://suzankarunga:Su24n@cluster0.vdqeyx1.mongodb.net/", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
