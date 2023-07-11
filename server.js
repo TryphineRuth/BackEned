@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");//handles passwords
 const User = require("./models/user.model");
 
-const port = 3000;
+const port = 4000;
 
 const app = express();
 app.use(express.json());
