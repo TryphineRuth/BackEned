@@ -82,22 +82,8 @@ app.get("/api/protected", (req, res) => {
     res.status(401).json({ message: "Invalid token" });
   }
 });
-app.delete("/api/protected", (req, res) => {
-  if (!req.headers.authorization) {
-    return res.status(401).json({ message: "Authorization header is missing" });
-  }
-
-  const authorizationHeader = req.headers.authorization;
-  const token = authorizationHeader.split(" ")[1];
-
-  try {
-    const decodedToken = jwt.verify(token, "your-secret-key");
-    const userId = decodedToken.userId;
-
-    res.status(200).json({ message: "Protected route accessed" });
-  } catch (error) {
-    res.status(401).json({ message: "Invalid token" });
-  }
+   app.delete('/users/:name', (req, res) => {
+    const username = req.params.name;
 });
 
 app.listen(port, () => {
