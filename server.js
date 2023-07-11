@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt");//handles passwords
 const User = require("./models/user.model");
 
 const port = 3000;
@@ -82,27 +82,8 @@ app.get("/api/protected", (req, res) => {
     res.status(401).json({ message: "Invalid token" });
   }
 });
-app.delete("/api/user/delete-user", async (req, res) => {
-  try {
-    const { username } = req.body;
-    console.log("username: ", username);
-    // Find the user by username and delete it
-    const deletedUser = await User.findOneAndDelete({ username });
 
-    if (!deletedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
+app.listen(port, () => {
+  console.log(`Server listening to port ${port}`);
+});
 
-    return res.status(200).json({ message: "User deleted successfully" });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-
-
-
-
-  //app.listen(port, () => {
-  //  console.log(`Server listening to port ${port}`);
-  //});
-  
