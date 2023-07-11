@@ -102,7 +102,7 @@ app.delete("/api/user/delete-user", async (req, res) => {
 
 
 
-  app.listen(port, () => {
-    console.log(`Server listening to port ${port}`);
-  });
+  //app.listen(port, () => {
+  //  console.log(`Server listening to port ${port}`);
+  //});
   
